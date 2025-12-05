@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>校内通讯</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* === 1. 页面：全屏灰色背景 === */
+        body, html { margin: 0; padding: 0; height: 100%; font-family: "Microsoft YaHei", 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif; overflow: hidden; }
+        #page { 
+            width: 100vw; height: 100vh; background-color: #e8e8e8;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* === 2. 互动界面：严格4:3，小于页面 === */
+        #ui { 
+            width: 80vw; max-width: 960px;
+            height: calc(80vw * 3 / 4); max-height: 720px;
+            background: white; border-radius: 12px; 
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            overflow: hidden; display: flex; flex-direction: column; 
+        }
+
+        /* === 3. 内容区 === */
+        #content-area { 
+            display: flex; flex: 1; overflow: hidden; 
+        }
+        
+        /* ===== 左侧聊天列表：宽度占比 30% (3:7比例中的3) ===== */
+        #sidebar { 
+            width: 30%; /* 左侧占30% */
+            background: #f8f8f8; border-right: 1px solid #e6e6e6; 
+            display: flex; flex-direction: column; overflow-y: auto; 
+        }
+        .chat-item { 
+            padding: 14px 16px; border-bottom: 1px solid #eee; 
+            cursor: pointer; display: flex; align-items: center;
+            transition: background 0.2s;
+        }
+        .chat-item:hover { background: #ededed; }
+        .chat-item.active { background: #e5e5e5; }
+        .avatar { 
+            width: 42px; height: 42px; border-radius: 6px; 
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            margin-right: 12px; flex-shrink: 0;
+        }
+        .chat-info { flex: 1; min-width: 0; }
+        .chat-name { font-weight: 500; color: #222; font-size: 15px; }
+        .preview { 
+            color: #888; font-size: 13px; margin-top: 3px; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+        }
+
+        /* ===== 右侧主显示区：宽度占比 70% (3:7比例中的7) ===== */
+        #main-display { 
+            width: 70%; /* 右侧占70% */
+            display: flex; flex-direction: column; 
+            background: white; overflow: hidden; 
+        }
+        /* 聊天区域头部 */
+        .chat-header { 
+            padding: 16px 20px; border-bottom: 1px solid #e6e6e6; 
+            font-weight: 500; font-size: 16px; color: #222; 
+            background: #fcfcfc; flex-shrink: 0;
+        }
+        /* 消息区域 */
+        .message-area { 
+            flex: 1; padding: 20px; overflow-y: auto; 
+            background: #f5f5f7; 
+        }
+        .message { display: flex; margin-bottom: 18px; }
+        .message-them { justify-content: flex-start; }
+        .message-me { justify-content: flex-end; }
+        /* 消息头像 */
+        .msg-avatar { width:36px; height:36px; border-radius:8px; background: linear-gradient(45deg,#4facfe,#00f2fe); flex-shrink:0; }
+        /* 我方头像与个人页面头像一致 */
+        .msg-avatar.me { background: linear-gradient(45deg,#f6b1b1,#f08b8b); }
+        /* 聊天消息与头像垂直居中 */
+        .message { align-items:center; }
+        .message-them .bubble { margin-left:12px; }
+        .message-me .bubble { margin-right:12px; }
+        .bubble { 
+            max-width: 70%; padding: 10px 14px; border-radius: 6px; 
+            line-height: 1.5; word-wrap: break-word; 
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .message-them .bubble { 
+            background: white; border: 1px solid #e1e1e1; color: #333; 
+        }
+        .message-me .bubble { 
+            background: #FCBEC3; color: #222; 
+        }
+
+        /* ===== 底部导航 ===== */
+        #bottom-nav { 
+            display: flex; height: 60px; 
+            background: #f8f8f8; border-top: 1px solid #e6e6e6; 
+            flex-shrink: 0;
+        }
+        .nav-icon { 
+            flex: 1; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; 
+            cursor: pointer; font-size: 12px; color: #666; 
+            transition: all 0.2s;
+        }
+        .nav-icon:hover { background-color: #f0f0f0; color: #333; }
+        .nav-icon.active { color: #FCBEC3; }
+        .nav-icon i { font-size: 20px; margin-bottom: 4px; }
+
+        /* ===== “朋友圈”和“我”的界面（默认隐藏）===== */
+        .page { 
+            display: none; flex: 1; flex-direction: column; 
+            overflow: hidden; 
+        }
+        .page.active { display: flex; }
+        
+        /* 朋友圈页面模拟 */
+        .moments-item { 
+            padding: 16px 20px; margin-bottom: 10px; background: #FCBEC3; border-radius: 8px; overflow: hidden;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+        }
+        /* 聊天记录顶部时间展示 */
+        .chat-time { text-align:center; padding:12px 0; margin-top:-16px; font-size:15px; color:#888; background:transparent; }
+            /* 弹窗样式（隐藏倒计时，弹窗在 100s 后弹出） */
+            .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; z-index:9999; }
+            .modal { background:#fff; border-radius:10px; width:360px; max-width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; }
+            .modal-header { padding:14px 18px; font-weight:700; font-size:18px; border-bottom:1px solid #eee; }
+            .modal-body { padding:16px 18px; font-size:15px; color:#333; }
+            .modal-footer { padding:12px 14px; display:flex; gap:10px; justify-content:center; border-top:1px solid #f0f0f0; }
+            .modal-btn { padding:8px 14px; border-radius:8px; cursor:pointer; border:1px solid #ddd; background:#fafafa; font-weight:600; }
+            .modal-btn.primary { background:#FCBEC3; border-color:rgba(0,0,0,0.08); }
+            .hidden { display:none !important; }
+        /* “我”的页面模拟 */
+        .profile-page { 
+            align-items: center; padding-top: 40px; 
+            background: linear-gradient(to bottom, #fcfcfc 30%, #f5f5f5 30%);
+        }
+        .profile-avatar { 
+            width: 80px; height: 80px; border-radius: 10px; 
+            background: #ccc; margin-bottom: 15px; 
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div id="page">
+        <div id="ui">
+            <div id="content-area">
+                <!-- 左侧聊天列表 (30%) -->
+                <div id="sidebar">
+                    <div class="chat-item active" onclick="switchToChat('group')">
+                        <div class="avatar"></div>
+                        <div class="chat-info">
+                            <div class="chat-name">苦巧克力装饰</div>
+                            <div class="preview">墙墙投稿！学长经常来412教室巡逻，去412上课的同学可以给学长带点零食！匿了谢谢墙！</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" onclick="switchToChat('professor')">
+                        <div class="avatar"></div>
+                        <div class="chat-info">
+                            <div class="chat-name">狂喝海水三千吨，吐到海满换学分 (5)</div>
+                            <div class="preview">我改的，123456789</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" onclick="switchToChat('xiong')">
+                        <div class="avatar"></div>
+                        <div class="chat-info">
+                            <div class="chat-name">熊先生你还我金鳞片</div>
+                            <div class="preview">123</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" onclick="switchToChat('xiaoyan')">
+                        <div class="avatar"></div>
+                        <div class="chat-info">
+                            <div class="chat-name">小言不闲</div>
+                            <div class="preview">123</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" onclick="switchToChat('yuhang')">
+                        <div class="avatar"></div>
+                        <div class="chat-info">
+                            <div class="chat-name">宇航欧巴的WeChat</div>
+                            <div class="preview">123</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" onclick="switchToChat('caomei')">
+                        <div class="avatar"></div>
+                        <div class="chat-info">
+                            <div class="chat-name">草莓芒果干</div>
+                            <div class="preview">123</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" onclick="switchToChat('zhaimao')">
+                        <div class="avatar"></div>
+                        <div class="chat-info">
+                            <div class="chat-name">炸毛可乐</div>
+                            <div class="preview">123</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧主显示区 (70%) -->
+                <div id="main-display">
+                    <div id="chat-page" class="page active">
+                        <div class="chat-header">苦巧克力装饰</div>
+                        <div class="message-area">
+                            <div class="chat-time">2025-12-05 14:32</div>
+                            <div class="message message-them">
+                                <div class="msg-avatar"></div>
+                                <div class="bubble">墙墙投稿！学长经常来412教室巡逻，去412上课的同学可以给学长带点零食！匿了谢谢墙！</div>
+                            </div>
+                            <div class="message message-me">
+                                <div class="bubble">收到！</div>
+                                <div class="msg-avatar me"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="moments-page" class="page">
+                        <div class="chat-header">生活圈</div>
+                        <div class="message-area">
+                            <div class="moments-item">
+                                <div><strong>AAA鲈鱼批发商</strong> 10月12日</div>
+                                <p>抢到伊老师的选修课了...！伊冷老师我的女神！</p>
+                            </div>
+                            <div class="moments-item">
+                                <div><strong>海大校园墙</strong> 10月11日</div>
+                                <p>大家注意安全！</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="profile-page" class="page profile-page">
+                        <div class="profile-avatar"></div>
+                        <div style="font-size:18px; margin-bottom:5px;">海大校园墙</div>
+                     
+                        <div style="width:100%; padding:0 20px;">
+                            <div style="padding:15px 0; border-bottom:1px solid #eee; padding-left:15px;"> <strong>我的收藏</strong></div>
+                            <div style="padding:15px 0; border-bottom:1px solid #eee; padding-left:15px;"> <strong>隐私安全</strong></div>
+                            <div style="padding:15px 0; padding-left:15px;"><strong>设置</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="bottom-nav">
+                <div class="nav-icon active" onclick="switchTab('chat')">
+                    <i class="fas fa-comment"></i><span>聊天</span>
+                </div>
+                <div class="nav-icon" onclick="switchTab('moments')">
+                    <i class="fas fa-camera"></i><span>生活圈</span>
+                </div>
+                <div class="nav-icon" onclick="switchTab('profile')">
+                    <i class="fas fa-user"></i><span>我</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- 定时弹窗（默认隐藏） -->
+        <div id="surprise-overlay" class="modal-overlay hidden" aria-hidden="true">
+            <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+                <div id="modal-title" class="modal-header">盗我号有意思吗</div>
+                <div id="modal-body" class="modal-body">请选择：</div>
+                <div id="modal-footer" class="modal-footer">
+                    <button id="modal-btn-1" class="modal-btn primary">是</button>
+                    <button id="modal-btn-2" class="modal-btn">否</button>
+                </div>
+            </div>
+        </div>
+
+    <script>
+        // 将左侧列表名字截断：如果长度超过 8，则保留前7个字符并在末尾用 ... 替代第8个字符
+        function truncateNames() {
+            document.querySelectorAll('.chat-name').forEach(el => {
+                const txt = el.textContent.trim();
+                if (txt.length > 8) {
+                    el.textContent = txt.slice(0, 7) + '...';
+                }
+            });
+        }
+
+        function switchToChat(chat) {
+            document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            // 确保在切换时也运行截断（以防名字动态变化）
+            truncateNames();
+            
+            const header = document.querySelector('#chat-page .chat-header');
+            const area = document.querySelector('#chat-page .message-area');
+            if (chat === 'group') {
+                header.innerText = '苦巧克力装饰';
+                area.innerHTML = `
+                    <div class="chat-time">2025-12-05 14:32</div>
+                    <div class="message message-them">
+                        <div class="msg-avatar"></div>
+                        <div class="bubble">墙墙投稿！学长经常来412教室巡逻，去412上课的同学可以给学长带点零食！匿了谢谢墙！</div>
+                    </div>
+                    <div class="message message-me">
+                        <div class="bubble">收到！</div>
+                        <div class="msg-avatar me"></div>
+                    </div>
+                `;
+            } else if (chat === 'xiong') {
+                header.innerText = '熊先生你还我金鳞片';
+                area.innerHTML = `
+                    <div class="chat-time">2025-12-05 15:00</div>
+                    <div class="message message-them">
+                        <div class="msg-avatar"></div>
+                        <div class="bubble">123</div>
+                    </div>
+                    <div class="message message-me">
+                        <div class="bubble">123</div>
+                        <div class="msg-avatar me"></div>
+                    </div>
+                `;
+            } else if (chat === 'xiaoyan') {
+                header.innerText = '小言不闲';
+                area.innerHTML = `
+                    <div class="chat-time">2025-12-05 15:02</div>
+                    <div class="message message-them">
+                        <div class="msg-avatar"></div>
+                        <div class="bubble">123</div>
+                    </div>
+                    <div class="message message-me">
+                        <div class="bubble">123</div>
+                        <div class="msg-avatar me"></div>
+                    </div>
+                `;
+            } else if (chat === 'yuhang') {
+                header.innerText = '宇航欧巴的WeChat';
+                area.innerHTML = `
+                    <div class="chat-time">2025-12-05 15:04</div>
+                    <div class="message message-them">
+                        <div class="msg-avatar"></div>
+                        <div class="bubble">123</div>
+                    </div>
+                    <div class="message message-me">
+                        <div class="bubble">123</div>
+                        <div class="msg-avatar me"></div>
+                    </div>
+                `;
+            } else if (chat === 'caomei') {
+                header.innerText = '草莓芒果干';
+                area.innerHTML = `
+                    <div class="chat-time">2025-12-05 15:06</div>
+                    <div class="message message-them">
+                        <div class="msg-avatar"></div>
+                        <div class="bubble">123</div>
+                    </div>
+                    <div class="message message-me">
+                        <div class="bubble">123</div>
+                        <div class="msg-avatar me"></div>
+                    </div>
+                `;
+            } else if (chat === 'zhaimao') {
+                header.innerText = '炸毛可乐';
+                area.innerHTML = `
+                    <div class="chat-time">2025-12-05 15:08</div>
+                    <div class="message message-them">
+                        <div class="msg-avatar"></div>
+                        <div class="bubble">123</div>
+                    </div>
+                    <div class="message message-me">
+                        <div class="bubble">123</div>
+                        <div class="msg-avatar me"></div>
+                    </div>
+                `;
+            } else {
+                header.innerText = '狂喝海水三千吨，吐到海满换学分 (5)';
+                area.innerHTML = `
+                    <div class="chat-time">2025-12-05 14:40</div>
+                    <div class="message message-me">
+                        <div class="bubble">我改的，123456789</div>
+                        <div class="msg-avatar me"></div>
+                    </div>
+                `;
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(`${tabName}-page`).classList.add('active');
+            
+            document.querySelectorAll('.nav-icon').forEach(icon => icon.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        // 页面加载后执行一次截断
+        document.addEventListener('DOMContentLoaded', truncateNames);
+
+        // ---------- 隐藏的 100 秒定时器弹窗逻辑 ----------
+        (function(){
+            // 阶段：0 = 初始未弹出，1 = 已显示第一个问题，2 = 已显示“我知道你是谁”，3 = 最终显示文本
+            let modalStage = 0;
+            const overlay = document.getElementById('surprise-overlay');
+            const titleEl = document.getElementById('modal-title');
+            const bodyEl = document.getElementById('modal-body');
+            const footerEl = document.getElementById('modal-footer');
+            const btn1 = document.getElementById('modal-btn-1');
+            const btn2 = document.getElementById('modal-btn-2');
+
+            function showOverlay(){
+                overlay.classList.remove('hidden');
+                overlay.setAttribute('aria-hidden','false');
+            }
+            function hideOverlay(){
+                overlay.classList.add('hidden');
+                overlay.setAttribute('aria-hidden','true');
+            }
+
+            function toStage1(){
+                modalStage = 1;
+                titleEl.innerText = '盗我号有意思吗';
+                bodyEl.innerText = '';
+                btn1.innerText = '是';
+                btn2.innerText = '否';
+                btn1.classList.add('primary');
+                btn2.classList.remove('primary');
+            }
+
+            function toStage2(){
+                modalStage = 2;
+                titleEl.innerText = '我知道你是谁';
+                bodyEl.innerText = '';
+                btn1.innerText = '是';
+                btn2.innerText = '是';
+                btn1.classList.add('primary');
+                btn2.classList.add('primary');
+            }
+
+            function toStage3(){
+                modalStage = 3;
+                titleEl.innerText = '';
+                bodyEl.innerText = '你是孚比酱><';
+                footerEl.innerHTML = '<button class="modal-btn primary" id="modal-final">确定</button>';
+                const finalBtn = document.getElementById('modal-final');
+                finalBtn.addEventListener('click', () => { hideOverlay(); });
+            }
+
+            // 绑定初始按钮行为（会在 stage 1、2 时被重用）
+            function bindButtons(){
+                btn1.addEventListener('click', function(){
+                    if(modalStage === 1){ toStage2(); }
+                    else if(modalStage === 2){ toStage3(); }
+                });
+                btn2.addEventListener('click', function(){
+                    if(modalStage === 1){ toStage2(); }
+                    else if(modalStage === 2){ toStage3(); }
+                });
+            }
+
+            bindButtons();
+
+            // 在页面加载后根据 URL 参数决定超时时间（秒）。
+            // 使用参数名 `timeoutSec`（单位：秒），例如打开文件时使用 `...?timeoutSec=5` 可以快速测试；
+            // 否则默认 100 秒（生产行为）。
+            window.addEventListener('load', function(){
+                let timeoutSec = 15; // 默认 15 秒（已按要求调整）
+                try {
+                    const url = new URL(window.location.href);
+                    const p = parseFloat(url.searchParams.get('timeoutSec'));
+                    if (!isNaN(p) && p >= 0) timeoutSec = p;
+                } catch (e) {
+                    // 如果 URL 解析失败（极少见），保持默认
+                }
+                // 控制台会打印实际使用的超时，便于调试（不显示在页面上）
+                console.log('Modal will appear after (sec):', timeoutSec);
+                setTimeout(function(){
+                    toStage1();
+                    showOverlay();
+                }, Math.round(timeoutSec * 1000));
+            });
+        })();
+    </script>
+</body>
+</html>
