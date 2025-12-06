@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>校内通讯</title>
+    <title>海大校园墙</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         /* === 1. 页面：全屏灰色背景 === */
@@ -121,15 +121,7 @@
         }
         /* 聊天记录顶部时间展示 */
         .chat-time { text-align:center; padding:12px 0; margin-top:-16px; font-size:15px; color:#888; background:transparent; }
-            /* 弹窗样式（隐藏倒计时，弹窗在 100s 后弹出） */
-            .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; z-index:9999; }
-            .modal { background:#fff; border-radius:10px; width:360px; max-width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; }
-            .modal-header { padding:14px 18px; font-weight:700; font-size:18px; border-bottom:1px solid #eee; }
-            .modal-body { padding:16px 18px; font-size:15px; color:#333; }
-            .modal-footer { padding:12px 14px; display:flex; gap:10px; justify-content:center; border-top:1px solid #f0f0f0; }
-            .modal-btn { padding:8px 14px; border-radius:8px; cursor:pointer; border:1px solid #ddd; background:#fafafa; font-weight:600; }
-            .modal-btn.primary { background:#FCBEC3; border-color:rgba(0,0,0,0.08); }
-            .hidden { display:none !important; }
+            /* （已移除弹窗样式） */
         /* “我”的页面模拟 */
         .profile-page { 
             align-items: center; padding-top: 40px; 
@@ -148,52 +140,80 @@
             <div id="content-area">
                 <!-- 左侧聊天列表 (30%) -->
                 <div id="sidebar">
-                    <div class="chat-item active" onclick="switchToChat('group')">
+                    <div class="chat-item active" onclick="switchToChat('group', this)">
                         <div class="avatar"></div>
                         <div class="chat-info">
                             <div class="chat-name">苦巧克力装饰</div>
                             <div class="preview">墙墙投稿！学长经常来412教室巡逻，去412上课的同学可以给学长带点零食！匿了谢谢墙！</div>
                         </div>
                     </div>
-                    <div class="chat-item" onclick="switchToChat('professor')">
+                    <div class="chat-item" onclick="switchToChat('professor', this)">
                         <div class="avatar"></div>
                         <div class="chat-info">
                             <div class="chat-name">狂喝海水三千吨，吐到海满换学分 (5)</div>
                             <div class="preview">我改的，123456789</div>
                         </div>
                     </div>
-                    <div class="chat-item" onclick="switchToChat('xiong')">
+                    <div class="chat-item" onclick="switchToChat('xiong', this)">
                         <div class="avatar"></div>
                         <div class="chat-info">
                             <div class="chat-name">熊先生你还我金鳞片</div>
                             <div class="preview">123</div>
                         </div>
                     </div>
-                    <div class="chat-item" onclick="switchToChat('xiaoyan')">
+                    <div class="chat-item" onclick="switchToChat('xiaoyan', this)">
                         <div class="avatar"></div>
                         <div class="chat-info">
                             <div class="chat-name">小言不闲</div>
                             <div class="preview">123</div>
                         </div>
                     </div>
-                    <div class="chat-item" onclick="switchToChat('yuhang')">
+                    <div class="chat-item" onclick="switchToChat('yuhang', this)">
                         <div class="avatar"></div>
                         <div class="chat-info">
                             <div class="chat-name">宇航欧巴的WeChat</div>
                             <div class="preview">123</div>
                         </div>
                     </div>
-                    <div class="chat-item" onclick="switchToChat('caomei')">
+                    <div class="chat-item" onclick="switchToChat('caomei', this)">
                         <div class="avatar"></div>
                         <div class="chat-info">
                             <div class="chat-name">草莓芒果干</div>
                             <div class="preview">123</div>
                         </div>
                     </div>
-                    <div class="chat-item" onclick="switchToChat('zhaimao')">
+                    <div class="chat-item" onclick="switchToChat('zhaimao', this)">
                         <div class="avatar"></div>
                         <div class="chat-info">
                             <div class="chat-name">炸毛可乐</div>
+                            <div class="preview">123</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" onclick="switchToChat('aaa', this)">
+                        <div class="avatar"></div>
+                        <div class="chat-info">
+                            <div class="chat-name">AAA鲈鱼批发商</div>
+                            <div class="preview">123</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" onclick="switchToChat('caoyoumei', this)">
+                        <div class="avatar"></div>
+                        <div class="chat-info">
+                            <div class="chat-name">草又莓了</div>
+                            <div class="preview">123</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" onclick="switchToChat('wz', this)">
+                        <div class="avatar"></div>
+                        <div class="chat-info">
+                            <div class="chat-name">W&Z</div>
+                            <div class="preview">123</div>
+                        </div>
+                    </div>
+                    <div class="chat-item" onclick="switchToChat('song', this)">
+                        <div class="avatar"></div>
+                        <div class="chat-info">
+                            <div class="chat-name">悠闲小宋（减肥版）</div>
                             <div class="preview">123</div>
                         </div>
                     </div>
@@ -257,17 +277,7 @@
         </div>
     </div>
 
-        <!-- 定时弹窗（默认隐藏） -->
-        <div id="surprise-overlay" class="modal-overlay hidden" aria-hidden="true">
-            <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-                <div id="modal-title" class="modal-header">盗我号有意思吗</div>
-                <div id="modal-body" class="modal-body">请选择：</div>
-                <div id="modal-footer" class="modal-footer">
-                    <button id="modal-btn-1" class="modal-btn primary">是</button>
-                    <button id="modal-btn-2" class="modal-btn">否</button>
-                </div>
-            </div>
-        </div>
+        <!-- （已移除定时弹窗相关 HTML） -->
 
     <script>
         // 将左侧列表名字截断：如果长度超过 8，则保留前7个字符并在末尾用 ... 替代第8个字符
@@ -280,9 +290,17 @@
             });
         }
 
-        function switchToChat(chat) {
+        function switchToChat(chat, el) {
+            // 切换到聊天页面（无论当前在“生活圈”或“我”界面）
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById('chat-page').classList.add('active');
+            // 更新底部导航高亮到“聊天”项
+            document.querySelectorAll('.nav-icon').forEach(icon => icon.classList.remove('active'));
+            const chatNav = document.querySelector(".nav-icon[onclick=\"switchTab('chat')\"]");
+            if (chatNav) chatNav.classList.add('active');
+
             document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            if (el && el.classList) el.classList.add('active');
             // 确保在切换时也运行截断（以防名字动态变化）
             truncateNames();
             
@@ -298,6 +316,66 @@
                     </div>
                     <div class="message message-me">
                         <div class="bubble">收到！</div>
+                        <div class="msg-avatar me"></div>
+                    </div>
+                `;
+            } else if (chat === 'aaa') {
+                header.innerText = 'AAA鲈鱼批发商';
+                area.innerHTML = `
+                    <div class="chat-time">2025-12-07 10:00</div>
+                    <div class="message message-them">
+                        <div class="msg-avatar"></div>
+                        <div class="bubble">墙墙你好！我U盘丢了，长这样，有捡到的同学请联系我！！有偿！！！</div>
+                    </div>
+                    <div class="message message-them">
+                        <div class="msg-avatar"></div>
+                        <div class="bubble"><img src="Upan.jpg" alt="Upan" style="max-width:220px; border-radius:8px; display:block;"></div>
+                    </div>
+                    <div class="message message-me">
+                        <div class="bubble">收到</div>
+                        <div class="msg-avatar me"></div>
+                    </div>
+                `;
+            } else if (chat === 'caoyoumei') {
+                header.innerText = '草又莓了';
+                area.innerHTML = `
+                    <div class="chat-time">2025-12-07 10:02</div>
+                    <div class="message message-them">
+                        <div class="msg-avatar"></div>
+                        <div class="bubble">123</div>
+                    </div>
+                    <div class="message message-me">
+                        <div class="bubble">123</div>
+                        <div class="msg-avatar me"></div>
+                    </div>
+                `;
+            } else if (chat === 'wz') {
+                header.innerText = 'W&Z';
+                area.innerHTML = `
+                    <div class="chat-time">2025-12-07 10:04</div>
+                    <div class="message message-them">
+                        <div class="msg-avatar"></div>
+                        <div class="bubble">123</div>
+                    </div>
+                    <div class="message message-me">
+                        <div class="bubble">123</div>
+                        <div class="msg-avatar me"></div>
+                    </div>
+                `;
+            } else if (chat === 'aaa') {
+                header.innerText = 'AAA鲈鱼批发商';
+                area.innerHTML = `
+                    <div class="chat-time">2025-12-07 10:00</div>
+                    <div class="message message-them">
+                        <div class="msg-avatar"></div>
+                        <div class="bubble">123</div>
+                    </div>
+                    <div class="message message-them">
+                        <div class="msg-avatar"></div>
+                        <div class="bubble"><img src="Upan.jpg" alt="Upan" style="max-width:100%; border-radius:8px; display:block;"></div>
+                    </div>
+                    <div class="message message-me">
+                        <div class="bubble">123</div>
                         <div class="msg-avatar me"></div>
                     </div>
                 `;
@@ -389,89 +467,6 @@
         // 页面加载后执行一次截断
         document.addEventListener('DOMContentLoaded', truncateNames);
 
-        // ---------- 隐藏的 100 秒定时器弹窗逻辑 ----------
-        (function(){
-            // 阶段：0 = 初始未弹出，1 = 已显示第一个问题，2 = 已显示“我知道你是谁”，3 = 最终显示文本
-            let modalStage = 0;
-            const overlay = document.getElementById('surprise-overlay');
-            const titleEl = document.getElementById('modal-title');
-            const bodyEl = document.getElementById('modal-body');
-            const footerEl = document.getElementById('modal-footer');
-            const btn1 = document.getElementById('modal-btn-1');
-            const btn2 = document.getElementById('modal-btn-2');
-
-            function showOverlay(){
-                overlay.classList.remove('hidden');
-                overlay.setAttribute('aria-hidden','false');
-            }
-            function hideOverlay(){
-                overlay.classList.add('hidden');
-                overlay.setAttribute('aria-hidden','true');
-            }
-
-            function toStage1(){
-                modalStage = 1;
-                titleEl.innerText = '盗我号有意思吗';
-                bodyEl.innerText = '';
-                btn1.innerText = '是';
-                btn2.innerText = '否';
-                btn1.classList.add('primary');
-                btn2.classList.remove('primary');
-            }
-
-            function toStage2(){
-                modalStage = 2;
-                titleEl.innerText = '我知道你是谁';
-                bodyEl.innerText = '';
-                btn1.innerText = '是';
-                btn2.innerText = '是';
-                btn1.classList.add('primary');
-                btn2.classList.add('primary');
-            }
-
-            function toStage3(){
-                modalStage = 3;
-                titleEl.innerText = '';
-                bodyEl.innerText = '你是孚比酱><';
-                footerEl.innerHTML = '<button class="modal-btn primary" id="modal-final">确定</button>';
-                const finalBtn = document.getElementById('modal-final');
-                finalBtn.addEventListener('click', () => { hideOverlay(); });
-            }
-
-            // 绑定初始按钮行为（会在 stage 1、2 时被重用）
-            function bindButtons(){
-                btn1.addEventListener('click', function(){
-                    if(modalStage === 1){ toStage2(); }
-                    else if(modalStage === 2){ toStage3(); }
-                });
-                btn2.addEventListener('click', function(){
-                    if(modalStage === 1){ toStage2(); }
-                    else if(modalStage === 2){ toStage3(); }
-                });
-            }
-
-            bindButtons();
-
-            // 在页面加载后根据 URL 参数决定超时时间（秒）。
-            // 使用参数名 `timeoutSec`（单位：秒），例如打开文件时使用 `...?timeoutSec=5` 可以快速测试；
-            // 否则默认 100 秒（生产行为）。
-            window.addEventListener('load', function(){
-                let timeoutSec = 15; // 默认 15 秒（已按要求调整）
-                try {
-                    const url = new URL(window.location.href);
-                    const p = parseFloat(url.searchParams.get('timeoutSec'));
-                    if (!isNaN(p) && p >= 0) timeoutSec = p;
-                } catch (e) {
-                    // 如果 URL 解析失败（极少见），保持默认
-                }
-                // 控制台会打印实际使用的超时，便于调试（不显示在页面上）
-                console.log('Modal will appear after (sec):', timeoutSec);
-                setTimeout(function(){
-                    toStage1();
-                    showOverlay();
-                }, Math.round(timeoutSec * 1000));
-            });
-        })();
     </script>
 </body>
 </html>
