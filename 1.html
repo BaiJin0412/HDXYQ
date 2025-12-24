@@ -67,6 +67,8 @@
         .message-area { 
             flex: 1; padding: 20px; overflow-y: auto; 
             background: #f5f5f7; 
+            display: flex;
+            flex-direction: column;
         }
         .message { display: flex; margin-bottom: 18px; }
         .message-them { justify-content: flex-start; }
@@ -90,7 +92,6 @@
         .message-me .bubble { 
             background: #FCBEC3; color: #222; 
         }
-
         /* ===== 底部导航 ===== */
         #bottom-nav { 
             display: flex; height: 60px; 
@@ -113,15 +114,56 @@
             overflow: hidden; 
         }
         .page.active { display: flex; }
+        #chat-page.active {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        #chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f5f5f7;
+            display: flex;
+            flex-direction: column;
+        }
         
         /* 朋友圈页面模拟 */
         .moments-item { 
-            padding: 16px 20px; margin-bottom: 10px; background: #FCBEC3; border-radius: 8px; overflow: hidden;
+            position: relative;
+            padding: 18px 20px; margin-bottom: 14px; background: #FCBEC3; border-radius: 8px; overflow: hidden;
             box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+            line-height: 1.7; /* 提高行高以改善可读性 */
         }
+        .moments-item > div, .moments-item > p {
+            line-height: 1.7; /* 标题与段落统一行高 */
+        }
+        .moments-item p { margin-top: 10px; margin-bottom: 0; }
+        /* 朋友圈顶部输入区域 */
+        .moments-input-container {
+            display: flex; gap: 10px; padding: 12px 16px; align-items: center; border-bottom: 1px solid #eee; background: #fff;
+        }
+        .moments-input-container textarea {
+            flex: 1; resize: vertical; min-height:64px; max-height:160px; padding:10px 12px; border-radius:8px; border:1px solid #e6e6e6; font-size:14px; font-family: inherit; line-height:1.4;
+        }
+        .moments-input-container .paper-btn {
+            width:40px; height:40px; border-radius:8px; background:#FCBEC3; display:flex; align-items:center; justify-content:center; cursor:pointer; border:none; color:#fff; font-size:16px;
+        }
+        .moments-item .trash-btn {
+            position: absolute; right:10px; bottom:10px; width:34px; height:34px; border-radius:6px; background:rgba(0,0,0,0.06); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#555; border: none;
+        }
+        .moments-item .trash-btn:hover { background:rgba(0,0,0,0.12); }
+
+        /* 确认对话框 */
+        .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); display:flex; align-items:center; justify-content:center; z-index:10000; }
+        .confirm-modal { background:#fff; border-radius:10px; width:320px; max-width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; }
+        .confirm-body { padding:18px; font-size:15px; color:#333; text-align:center; }
+        .confirm-footer { padding:12px; display:flex; gap:10px; justify-content:center; border-top:1px solid #f0f0f0; }
+        .confirm-btn { padding:8px 14px; border-radius:8px; cursor:pointer; border:1px solid #ddd; background:#fafafa; font-weight:600; }
+        .confirm-btn.delete { background:#f66; color:#fff; border-color:rgba(0,0,0,0.06); }
+        .hidden { display:none !important; }
         /* 聊天记录顶部时间展示 */
         .chat-time { text-align:center; padding:12px 0; margin-top:-16px; font-size:15px; color:#888; background:transparent; }
-            /* （已移除弹窗样式） */
         /* “我”的页面模拟 */
         .profile-page { 
             align-items: center; padding-top: 40px; 
@@ -130,6 +172,54 @@
         .profile-avatar { 
             width: 80px; height: 80px; border-radius: 10px; 
             background: #ccc; margin-bottom: 15px; 
+        }
+        /* 账号管理与登录样式 */
+        .link-btn { background: none; border: none; color: #222; padding: 8px 10px; font-size:14px; cursor: pointer; }
+        .account-overlay { position: fixed; inset: 0; display:flex; align-items:center; justify-content:center; z-index:10001; }
+        .account-modal { background:#fff; border-radius:10px; width:360px; max-width:92%; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; }
+        .account-list { display:flex; flex-direction:column; }
+        .account-item { padding:14px 18px; border-bottom:1px solid #f0f0f0; cursor:pointer; }
+        .account-item.danger { color: #e74c3c; font-weight:600; }
+
+        .btn { padding:8px 14px; border-radius:8px; cursor:pointer; border:1px solid #ddd; background:#fafafa; font-weight:600; }
+        .btn.primary { background:#FCBEC3; border-color:rgba(0,0,0,0.06); }
+        .overlay-backdrop { position:fixed; inset:0; background:transparent; }
+        .hidden { display:none !important; }
+        /* 聊天输入框样式 */
+        .chat-input-container {
+            display: flex;
+            padding: 12px;
+            background: #fff;
+            border-top: 1px solid #eee;
+            align-items: flex-end;
+        }
+        #chat-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            resize: none;
+            max-height: 120px;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .send-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #FCBEC3;
+            border: none;
+            color: #fff;
+            margin-left: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .send-btn:hover {
+            background: #f9a3aa;
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -140,6 +230,13 @@
             <div id="content-area">
                 <!-- 左侧聊天列表 (30%) -->
                 <div id="sidebar">
+                    <div class="chat-item" onclick="switchToChat('qun', this)">
+                        <div class="avatar"></div>
+                        <div class="chat-info">
+                            <div class="chat-name">狂喝海水三千吨，吐到海满换学分 (5)</div>
+                            <div class="preview">我改的，123456789</div>
+                        </div>
+                    </div>
                     <div class="chat-item active" onclick="switchToChat('group', this)">
                         <div class="avatar"></div>
                         <div class="chat-info">
@@ -147,11 +244,11 @@
                             <div class="preview">墙墙投稿！学长经常来412教室巡逻，去412上课的同学可以给学长带点零食！匿了谢谢墙！</div>
                         </div>
                     </div>
-                    <div class="chat-item" onclick="switchToChat('professor', this)">
+                    <div class="chat-item" onclick="switchToChat('qi', this)">
                         <div class="avatar"></div>
                         <div class="chat-info">
-                            <div class="chat-name">狂喝海水三千吨，吐到海满换学分 (5)</div>
-                            <div class="preview">我改的，123456789</div>
+                            <div class="chat-name">柒柒.</div>
+                            <div class="preview">墙好 明明都说了东门危险 怎么有傻子往那去啊 天天都能听说有人受伤 长点心吧大家 匿了</div>
                         </div>
                     </div>
                     <div class="chat-item" onclick="switchToChat('xiong', this)">
@@ -223,7 +320,7 @@
                 <div id="main-display">
                     <div id="chat-page" class="page active">
                         <div class="chat-header">苦巧克力装饰</div>
-                        <div class="message-area">
+                        <div class="message-area" id="chat-messages">
                             <div class="chat-time">2025-12-05 14:32</div>
                             <div class="message message-them">
                                 <div class="msg-avatar"></div>
@@ -234,18 +331,27 @@
                                 <div class="msg-avatar me"></div>
                             </div>
                         </div>
+                        <div class="chat-input-container">
+                            <textarea id="chat-input" placeholder="输入消息...（按 Enter 发送，Shift+Enter 换行）"></textarea>
+                            <button id="chat-send" class="send-btn" title="发送"><i class="fas fa-level-down-alt"></i></button>
+                        </div>
                     </div>
 
                     <div id="moments-page" class="page">
                         <div class="chat-header">生活圈</div>
-                        <div class="message-area">
+                        <div class="moments-input-container">
+                            <textarea id="moments-input" placeholder="在生活圈发表点什么...（按 Enter 发送，Shift+Enter 换行）"></textarea>
+                            <button id="moments-send" class="paper-btn" title="发送"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                        <div class="message-area" id="moments-area">
                             <div class="moments-item">
                                 <div><strong>AAA鲈鱼批发商</strong> 10月12日</div>
                                 <p>抢到伊老师的选修课了...！伊冷老师我的女神！</p>
                             </div>
                             <div class="moments-item">
-                                <div><strong>海大校园墙</strong> 10月11日</div>
-                                <p>大家注意安全！</p>
+                                        <div><strong>海大校园墙</strong> 10月11日</div>
+                                        <p>有同学路过东门被掉下来的东西砸伤了，好在伤势不严重，大家一定不要前往东门，尽量绕路走，大家注意安全！</p>
+                                        <button class="trash-btn" title="删除"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>
                     </div>
@@ -257,7 +363,10 @@
                         <div style="width:100%; padding:0 20px;">
                             <div style="padding:15px 0; border-bottom:1px solid #eee; padding-left:15px;"> <strong>我的收藏</strong></div>
                             <div style="padding:15px 0; border-bottom:1px solid #eee; padding-left:15px;"> <strong>隐私安全</strong></div>
-                            <div style="padding:15px 0; padding-left:15px;"><strong>设置</strong></div>
+                            <div style="padding:15px 0; border-bottom:1px solid #eee; padding-left:15px;"><strong>设置</strong></div>
+                                <div style="padding:15px 0; border-bottom:1px solid #eee; padding-left:15px;">
+                                    <strong id="account-manage-btn" style="cursor: pointer;" onclick="document.getElementById('account-overlay').classList.remove('hidden')">账号管理</strong>
+                                </div>
                         </div>
                     </div>
                 </div>
@@ -277,7 +386,6 @@
         </div>
     </div>
 
-        <!-- （已移除定时弹窗相关 HTML） -->
 
     <script>
         // 将左侧列表名字截断：如果长度超过 8，则保留前7个字符并在末尾用 ... 替代第8个字符
@@ -298,6 +406,11 @@
             document.querySelectorAll('.nav-icon').forEach(icon => icon.classList.remove('active'));
             const chatNav = document.querySelector(".nav-icon[onclick=\"switchTab('chat')\"]");
             if (chatNav) chatNav.classList.add('active');
+            
+            // 确保聊天输入框显示
+            if (typeof updateChatInputVisibility === 'function') {
+                updateChatInputVisibility();
+            }
 
             document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
             if (el && el.classList) el.classList.add('active');
@@ -317,6 +430,15 @@
                     <div class="message message-me">
                         <div class="bubble">收到！</div>
                         <div class="msg-avatar me"></div>
+                    </div>
+                `;
+            } else if (chat === 'qi') {
+                header.innerText = '柒柒.';
+                area.innerHTML = `
+                    <div class="chat-time">2025-12-07 10:00</div>
+                    <div class="message message-them">
+                        <div class="msg-avatar"></div>
+                        <div class="bubble">墙好 明明都说了东门危险 怎么有傻子往那去啊 天天都能听说有人受伤 长点心吧大家 匿了</div>
                     </div>
                 `;
             } else if (chat === 'aaa') {
@@ -342,10 +464,14 @@
                     <div class="chat-time">2025-12-07 10:02</div>
                     <div class="message message-them">
                         <div class="msg-avatar"></div>
-                        <div class="bubble">123</div>
+                        <div class="bubble">墙墙，有同学路过东门被掉下来的东西砸伤了，好在伤势不严重，大家一定不要前往东门，尽量绕路走</div>
+                    </div>
+                    <div class="message message-them">
+                        <div class="msg-avatar"></div>
+                        <div class="bubble">匿了</div>
                     </div>
                     <div class="message message-me">
-                        <div class="bubble">123</div>
+                        <div class="bubble">收到</div>
                         <div class="msg-avatar me"></div>
                     </div>
                 `;
@@ -444,6 +570,19 @@
                         <div class="msg-avatar me"></div>
                     </div>
                 `;
+            } else if (chat === 'song') {
+                header.innerText = '悠闲小宋（减肥版）';
+                area.innerHTML = `
+                    <div class="chat-time">2025-12-05 15:10</div>
+                    <div class="message message-them">
+                        <div class="msg-avatar"></div>
+                        <div class="bubble">123</div>
+                    </div>
+                    <div class="message message-me">
+                        <div class="bubble">123</div>
+                        <div class="msg-avatar me"></div>
+                    </div>
+                `;
             } else {
                 header.innerText = '狂喝海水三千吨，吐到海满换学分 (5)';
                 area.innerHTML = `
@@ -455,18 +594,272 @@
                 `;
             }
         }
-
         function switchTab(tabName) {
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             document.getElementById(`${tabName}-page`).classList.add('active');
             
             document.querySelectorAll('.nav-icon').forEach(icon => icon.classList.remove('active'));
             event.currentTarget.classList.add('active');
+            
+            // 更新聊天输入框的显示状态
+            if (typeof updateChatInputVisibility === 'function') {
+                updateChatInputVisibility();
+            }
+            
+            // 如果切换到"我"页面，确保账号管理按钮事件已绑定
+            if(tabName === 'profile' && typeof bindAccountEvents === 'function') {
+                bindAccountEvents();
+            }
         }
 
-        // 页面加载后执行一次截断
-        document.addEventListener('DOMContentLoaded', truncateNames);
+        // 聊天输入框功能
+        document.addEventListener('DOMContentLoaded', function() {
+            truncateNames();
+            
+            const chatInput = document.getElementById('chat-input');
+            const chatSend = document.getElementById('chat-send');
+            const messageArea = document.getElementById('chat-messages');
+            
+            // 确保只在聊天页面显示输入框
+            function updateChatInputVisibility() {
+                const chatPage = document.getElementById('chat-page');
+                const chatInputContainer = document.querySelector('.chat-input-container');
+                const momentsPage = document.getElementById('moments-page');
+                const profilePage = document.getElementById('profile-page');
+                
+                if (chatPage && chatPage.classList.contains('active')) {
+                    if (chatInputContainer) chatInputContainer.style.display = 'flex';
+                } else {
+                    if (chatInputContainer) chatInputContainer.style.display = 'none';
+                }
+            }
+            
+            function sendMessage() {
+                const text = chatInput.value.trim();
+                if (!text) return;
+                
+                // 创建新消息
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message message-me';
+                
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                bubble.textContent = text;
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'msg-avatar me';
+                
+                messageDiv.appendChild(bubble);
+                messageDiv.appendChild(avatar);
+                
+                // 添加到消息区域
+                messageArea.appendChild(messageDiv);
+                
+                // 清空输入框
+                chatInput.value = '';
+                
+                // 滚动到底部
+                messageArea.scrollTop = messageArea.scrollHeight;
+            }
+            
+            // 发送按钮点击事件
+            if (chatSend) {
+                chatSend.addEventListener('click', sendMessage);
+            }
+            
+            // 输入框键盘事件
+            if (chatInput) {
+                chatInput.addEventListener('keydown', function(e) {
+                    // 按下Enter键发送消息
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                    // 按下Shift+Enter换行（默认行为）
+                });
+            }
+            
+            // 初始化时调用一次，确保输入框显示状态正确
+            updateChatInputVisibility();
+        });
+
+        // 生活圈：发布动态交互逻辑
+        (function(){
+            const input = document.getElementById('moments-input');
+            const sendBtn = document.getElementById('moments-send');
+            const momentsArea = document.getElementById('moments-area');
+
+            function formatNow(){
+                const d = new Date();
+                const M = d.getMonth()+1;
+                const D = d.getDate();
+                return `${M}月${D}日 ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+            }
+
+            function postMoment(){
+                if(!input) return;
+                const txt = input.value.trim();
+                if(!txt) return;
+                const item = document.createElement('div');
+                item.className = 'moments-item';
+                const header = document.createElement('div');
+                // 玩家操控为“海大校园墙”，因此发布者显示为“海大校园墙”并自动带删除按钮
+                header.innerHTML = `<strong>海大校园墙</strong> ${formatNow()}`;
+                const p = document.createElement('p');
+                p.textContent = txt;
+                item.appendChild(header);
+                item.appendChild(p);
+                // 将新内容插到最上方（在现有第一个 moments-item 之前）
+                if(momentsArea.firstChild) momentsArea.insertBefore(item, momentsArea.firstChild);
+                else momentsArea.appendChild(item);
+                // 清空输入框
+                input.value = '';
+                // 切换到生活圈页以展示（如果当前不在的话）
+                document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+                document.getElementById('moments-page').classList.add('active');
+                document.querySelectorAll('.nav-icon').forEach(icon => icon.classList.remove('active'));
+                const momentsNav = document.querySelector(".nav-icon[onclick=\"switchTab('moments')\"]");
+                if(momentsNav) momentsNav.classList.add('active');
+                // 发布后检查是否要为新插入的项绑定垃圾桶（通常新发布为“我”，但保持一致性）
+                bindTrashButtons();
+            }
+
+            if(sendBtn){
+                sendBtn.addEventListener('click', postMoment);
+            }
+            if(input){
+                input.addEventListener('keydown', function(e){
+                    if(e.key === 'Enter' && !e.shiftKey){
+                        e.preventDefault();
+                        postMoment();
+                    }
+                });
+            }
+            // 为已存在或后续创建的由“海大校园墙”发布的项添加垃圾桶（右下角）并绑定事件
+            function bindTrashButtons(){
+                const items = document.querySelectorAll('#moments-area .moments-item');
+                items.forEach(it => {
+                    // 避免重复绑定：如果已存在 .trash-btn 就跳过
+                    if(it.querySelector('.trash-btn')) return;
+                    const header = it.querySelector('div');
+                    if(header && header.textContent && header.textContent.includes('海大校园墙')){
+                        const btn = document.createElement('button');
+                        btn.className = 'trash-btn';
+                        btn.title = '删除';
+                        btn.innerHTML = '<i class="fas fa-trash"></i>';
+                        it.appendChild(btn);
+                        btn.addEventListener('click', function(e){
+                            e.stopPropagation();
+                            showConfirm(it);
+                        });
+                    }
+                });
+            }
+
+            // 确认对话框逻辑
+            let pendingDelete = null;
+            function showConfirm(targetItem){
+                pendingDelete = targetItem;
+                const overlay = document.getElementById('confirm-overlay');
+                if(overlay) overlay.classList.remove('hidden');
+            }
+            function hideConfirm(){
+                pendingDelete = null;
+                const overlay = document.getElementById('confirm-overlay');
+                if(overlay) overlay.classList.add('hidden');
+            }
+
+            function doDelete(){
+                if(pendingDelete && pendingDelete.parentNode){
+                    pendingDelete.parentNode.removeChild(pendingDelete);
+                }
+                hideConfirm();
+            }
+
+            // 初始化：绑定已有的垃圾桶并绑定确认对话框按钮（在 DOMContentLoaded 中执行，确保元素存在）
+            document.addEventListener('DOMContentLoaded', function(){
+                bindTrashButtons();
+                const delBtn = document.getElementById('confirm-delete');
+                const cancelBtn = document.getElementById('confirm-cancel');
+                if(delBtn) delBtn.addEventListener('click', doDelete);
+                if(cancelBtn) cancelBtn.addEventListener('click', hideConfirm);
+                const confirmOverlay = document.getElementById('confirm-overlay');
+                if(confirmOverlay){
+                    confirmOverlay.addEventListener('click', function(event){
+                        if(event.target === confirmOverlay || event.target.classList.contains('overlay-backdrop')){
+                            hideConfirm();
+                        }
+                    });
+                }
+                // 绑定账号管理、登出与登录相关按钮
+                function bindAccountEvents() {
+                    const accountBtn = document.getElementById('account-manage-btn');
+                    const accountOverlay = document.getElementById('account-overlay');
+                    const switchAccount = document.getElementById('switch-account');
+                    const logoutAccount = document.getElementById('logout-account');
+
+                    if(accountBtn){
+                        accountBtn.addEventListener('click', function(event){
+                            event.stopPropagation();
+                            accountOverlay.classList.remove('hidden');
+                        });
+                    }
+                    if(accountOverlay){
+                        accountOverlay.addEventListener('click', function(event){
+                            if(event.target.classList.contains('overlay-backdrop')){
+                                accountOverlay.classList.add('hidden');
+                            }
+                        });
+                    }
+                    if(switchAccount){
+                        switchAccount.addEventListener('click', function(event){
+                            event.stopPropagation();
+                            // 直接跳转到登录页
+                            window.location.href = 'login.html';
+                        });
+                    }
+                    if(logoutAccount){
+                          logoutAccount.addEventListener('click', function(event){
+                         event.stopPropagation(); // 阻止事件干扰
+                           // 直接跳转到登录页
+                           window.location.href = 'login.html';
+                     });
+                    }
+                }
+
+                // 初始绑定一次
+                bindAccountEvents();
+                
+            });
+            // 每次发布也检查是否需要绑定（发布时会插入新节点）
+            const originalPost = postMoment;
+            // override postMoment variable reference not needed because we create items only as '我'
+        })();
 
     </script>
+    <!-- 账号管理模态 -->
+    <div id="account-overlay" class="account-overlay hidden" aria-hidden="true">
+        <div class="overlay-backdrop"></div>
+        <div class="account-modal">
+            <div class="account-list">
+                <div class="account-item" id="switch-account">切换账号</div>
+                <div class="account-item danger" id="logout-account">退出账号</div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <!-- 删除确认对话框（默认隐藏） -->
+    <div id="confirm-overlay" class="confirm-overlay hidden" aria-hidden="true">
+        <div class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+            <div id="confirm-title" class="confirm-body">确定删除吗</div>
+            <div class="confirm-footer">
+                <button id="confirm-delete" class="confirm-btn delete">删除</button>
+                <button id="confirm-cancel" class="confirm-btn">取消</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
